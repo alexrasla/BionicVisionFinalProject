@@ -1,0 +1,5 @@
+__pycache__
+*.pickle
+*.log
+Particle_Swarm_Final_Project.ipynb
+
