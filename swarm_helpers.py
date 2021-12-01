@@ -67,3 +67,61 @@ def particle_swarm(iterations, bounds, model):
             print(f"[Iteration {i}] Best Cost: {swarm.best_cost}")
 
     return swarm.best_pos, swarm.best_cost 
+
+# Method for dealing with overlapping electrodes
+
+from scipy.spatial.distance import cdist
+from scipy.spatial import distance
+import random
+
+
+def findOverlap (ePositions, r):
+  coords = ePositions.copy()
+  distArray = distance.cdist(coords, coords, 'euclidean')
+  arrayLen = distArray.shape[0]
+  numColumns = arrayLen - 1
+  numRows = arrayLen - 1
+
+  overlapItems = []
+  for row in range (0, numRows):
+    for col in range (row+1, numColumns + 1):
+      arrayItem = distArray[row][col]
+      # This line sets what is considered overlap distance
+      if arrayItem < (r * 2):
+        overlapItems.append(row)
+        overlapItems.append(col)
+  
+  removeIndex = list(set(overlapItems))
+  
+  positions = []
+  for index in removeIndex:
+    positions.append(coords[index])
+  positions = np.array(positions)
+
+  return positions, removeIndex
+
+def genCoord(lenPoints, bds):
+  lb, up = bds
+  x = random.sample(range(lb[0], up[1]), lenPoints)
+  y = random.sample(range(lb[1], up[1],), lenPoints)
+
+  points = list(zip(x,y))
+  points = np.array(points)
+  return points
+  
+def fixOverlap(ePositions, r, bds):
+  posArray = ePositions.copy()
+  positions, removeIndex = findOverlap(posArray, r)
+  newPos = genCoord(len(removeIndex), bds)
+ 
+  for i in range (len(removeIndex)):
+    index = removeIndex[i]
+    posArray[index] = newPos[i]
+  return posArray, len(positions)
+
+# Code to run it in main when I figure out how to optimize it
+# ePositions = my_swarm.position.copy()
+# ePositions, lenPosition = fixOverlap(ePositions, radius, bounds)
+# while (lenPosition > 0):
+#     ePositions, lenPosition = fixOverlap(ePositions, radius, bounds)
+# my_swarm.position = ePositions
