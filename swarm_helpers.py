@@ -7,6 +7,10 @@ import pyswarms.backend as P
 from pyswarms.backend.topology import Ring
 from itertools import combinations
 
+from scipy.spatial.distance import cdist
+from scipy.spatial import distance
+import random
+
 import implant_helpers as imp
 
 # The error function must accept a tuple of parameter values `params` first, but
@@ -69,10 +73,6 @@ def particle_swarm(iterations, bounds, model):
     return swarm.best_pos, swarm.best_cost 
 
 # Method for dealing with overlapping electrodes
-
-from scipy.spatial.distance import cdist
-from scipy.spatial import distance
-import random
 
 
 def findOverlap (ePositions, r):
