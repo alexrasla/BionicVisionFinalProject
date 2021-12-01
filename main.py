@@ -20,9 +20,9 @@ if __name__ == '__main__':
     print(f"Inital Number of Effective Electrodes: {init_effective}")
     
     # Bounds 
-    search_params = {
-        'a': (-2500, 2000),
-        'b': (-2000, 2000)
+    bound_params = {
+        'x': (-2500, 2000),
+        'y': (-2000, 2000)
     }
     lb = [v[0] for v in search_params.values()]
     ub = [v[1] for v in search_params.values()]
