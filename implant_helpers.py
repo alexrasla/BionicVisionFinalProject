@@ -1,22 +1,21 @@
 import numpy as np
+import pulse2percept as p2p
 from pulse2percept.implants import DiskElectrode, ProsthesisSystem, ElectrodeArray
-
-def buildElectrodeArray (electrodePositions, radius):
+  
+def build_implant(params, r=100):
+    # There could be a smarter way to handle all these params
     '''
     Takes an array of tuples giving the electrode position
     '''
-    earray = ElectrodeArray({})
-    for position in electrodePositions:
-        x = position[0]
-        y = position[1]
-        # print(x,y)
-        earray.add_electrode(f'{x}{y}', DiskElectrode(x, y, 0, r=radius))
 
-    implant = ProsthesisSystem(earray)
-
+    electrodes = []
+    for i in range(len(params) - 1):
+          electrodes.append(p2p.implants.DiskElectrode(params[i], params[i+1], 0, r))
+    
+    implant = p2p.implants.ProsthesisSystem(p2p.implants.ElectrodeArray(electrodes))
     return implant
 
-def numberOfEffectiveElectrodes (implant, model):
+def get_num_effective(implant, model):
   
   percepts = []
   for name in implant.electrode_names:
@@ -27,7 +26,6 @@ def numberOfEffectiveElectrodes (implant, model):
   allPixelData = []
 
   for percept in percepts:
-    data = percept.data
     xy = percept.data
     F = xy.reshape(xy.shape[0], xy.shape[1])
     allPixelData.append(F)
