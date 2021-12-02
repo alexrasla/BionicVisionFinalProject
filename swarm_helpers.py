@@ -23,17 +23,18 @@ def err_func(swarm_positions, bounds, model):
         
         implant = imp.build_implant(electrode_positions)
         n_eff = imp.get_num_effective(implant, model)
+        scores.append(implant.n_electrodes - n_eff)
         
-        # Pairwise distance between electrodes:
-        pair_dist = np.array([(e1.x - e2.x) ** 2 + (e1.y - e2.y) ** 2 
-                            for (e1, e2) in combinations(implant.electrode_objects, 2)])
-        # Maybe try to minimize the average pairwise distance:
-        avg_pair_dist = np.mean(pair_dist)
-        # Maybe if they're too close to each other, add a penalty:
-        too_close_penalty = np.sum(pair_dist <= 200 ** 2)
+        # # Pairwise distance between electrodes:
+        # pair_dist = np.array([(e1.x - e2.x) ** 2 + (e1.y - e2.y) ** 2 
+        #                     for (e1, e2) in combinations(implant.electrode_objects, 2)])
+        # # Maybe try to minimize the average pairwise distance:
+        # avg_pair_dist = np.mean(pair_dist)
+        # # Maybe if they're too close to each other, add a penalty:
+        # too_close_penalty = np.sum(pair_dist <= 200 ** 2)
 
-        # Need to add your own weights, of course, and play with different terms:
-        scores.append( -(1000 * n_eff - 0.1 * avg_pair_dist - 1e5 * too_close_penalty))
+        # # Need to add your own weights, of course, and play with different terms:
+        # scores.append( -(1000 * n_eff - 0.1 * avg_pair_dist - 1e5 * too_close_penalty))
     
     return np.array(scores)
 
