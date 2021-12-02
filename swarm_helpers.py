@@ -10,18 +10,19 @@ from itertools import combinations
 from scipy.spatial.distance import cdist
 from scipy.spatial import distance
 import random
+import json
 
 import implant_helpers as imp
 
 # The error function must accept a tuple of parameter values `params` first, but
 # can have other input variables like `features` and `targets`
-def err_func(swarm_positions, bounds, model):
+def loss_func_1(swarm_positions, electrode_size, bounds, model):
     
     # Electrode positions
     scores = []
     for electrode_positions in swarm_positions:
         
-        implant = imp.build_implant(electrode_positions)
+        implant = imp.build_implant(electrode_positions, electrode_size)
         n_eff = imp.get_num_effective(implant, model)
         scores.append(implant.n_electrodes - n_eff)
         
@@ -37,32 +38,45 @@ def err_func(swarm_positions, bounds, model):
         # scores.append( -(1000 * n_eff - 0.1 * avg_pair_dist - 1e5 * too_close_penalty))
     
     return np.array(scores)
+  
+def loss_func_2(swarm_positions, electrode_size, bounds, model):
+    
+    scores = []
+    for electrode_positions in swarm_positions:
+        
+        implant = imp.build_implant(electrode_positions, electrode_size)
+        n_eff = imp.get_num_effective(implant, model)
+        scores.append(implant.n_electrodes - n_eff)
+          
+    return np.array(scores)
 
 
-def particle_swarm(iterations, bounds, overlapBounds, model):
+def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bounds, overlapBounds, model, experiments, loss_func):
     '''
     Particle Swarm optimization loop
     '''
+    
+    curr_experiment = experiments[num_electrodes][electrode_size][loss_func]
+
     # Parameters of how particles move
     options = {'c1': 2.3, 'c2': 1.9, 'w': 1.6}
     
     # Initialize the swarm
-    swarm = P.create_swarm(n_particles=50, dimensions=120, options=options) # The Swarm Class
+    swarm = P.create_swarm(n_particles=num_particles, dimensions=int(num_electrodes)*2, options=options) # The Swarm Class
     my_topology = Ring() # The Topology Class
 
     for i in range(iterations):
-        # Part 1: Update personal best
-        # Computes current cost of electrodes
-        swarm.current_cost = err_func(swarm.position, bounds, model=model)
-
+        # Update personal best
+        swarm.current_cost = eval(loss_func + "(swarm.position, int(electrode_size), bounds, model)")
+        # swarm.current_cost = err_func(swarm.position, int(electrode_size), bounds, model=model)
+        
         minIndex = np.argmin(swarm.current_cost)
+        
         if (swarm.current_cost[minIndex]) < swarm.best_cost:
           swarm.best_cost = swarm.current_cost[minIndex]
           swarm.best_pos = swarm.position[minIndex]
-
-        # Part 3: Update position and velocity matrices
-        # Note that position and velocity updates are dependent on your topology
-        # Takes in the bounds 
+                  
+        # Update position and velocity matrices
         swarm.velocity = my_topology.compute_velocity(swarm)
         swarm.position = my_topology.compute_position(swarm, bounds)
 
@@ -70,8 +84,14 @@ def particle_swarm(iterations, bounds, overlapBounds, model):
         
         # if i % 10 == 0:
         #     print(f"[Iteration {i}] Best Cost: {swarm.best_cost}")
-        print("best cost:", swarm.best_cost)
-
+        curr_experiment["best_cost_iterations"].append(int(swarm.best_cost))
+    
+    curr_experiment["best_cost"] = int(swarm.best_cost)
+    
+    with open('data.json', 'w') as data:
+      json.dump(experiments, data)
+      print("JSON Updated")
+      
     return swarm.best_pos, swarm.best_cost 
 
 # Method for dealing with overlapping electrodes
