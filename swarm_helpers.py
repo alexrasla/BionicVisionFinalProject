@@ -39,7 +39,7 @@ def err_func(swarm_positions, bounds, model):
     return np.array(scores)
 
 
-def particle_swarm(iterations, bounds, model):
+def particle_swarm(iterations, bounds, overlapBounds, model):
     '''
     Particle Swarm optimization loop
     '''
@@ -94,13 +94,8 @@ def findOverlap (ePositions, r):
         overlapItems.append(col)
   
   removeIndex = list(set(overlapItems))
-  
-  positions = []
-  for index in removeIndex:
-    positions.append(coords[index])
-  positions = np.array(positions)
 
-  return positions, removeIndex
+  return removeIndex
 
 def genCoord(lenPoints, bds):
   lb, up = bds
@@ -113,17 +108,33 @@ def genCoord(lenPoints, bds):
   
 def fixOverlap(ePositions, r, bds):
   posArray = ePositions.copy()
-  positions, removeIndex = findOverlap(posArray, r)
+  removeIndex = findOverlap(posArray, r)
   newPos = genCoord(len(removeIndex), bds)
  
   for i in range (len(removeIndex)):
     index = removeIndex[i]
     posArray[index] = newPos[i]
-  return posArray, len(positions)
+  return posArray, len(removeIndex)
 
-# Code to run it in main when I figure out how to optimize it
-# ePositions = my_swarm.position.copy()
-# ePositions, lenPosition = fixOverlap(ePositions, radius, bounds)
-# while (lenPosition > 0):
-#     ePositions, lenPosition = fixOverlap(ePositions, radius, bounds)
-# my_swarm.position = ePositions
+def newXYArray(eArray):
+  coords = []
+  for i in range(0, len(eArray) -1, 2):
+    coords.append((eArray[i], eArray[i+1]))
+  return coords
+
+def backTo1DArray (coords):
+  eArray = []
+  for coord in coords:
+    eArray.append(coord[0])
+    eArray.append(coord[1])
+  return eArray
+
+def overlapOverWholeSwarm(arrayOfPositions, bounds, radius = 100):
+  for i in range (len(arrayOfPositions)):
+    ePositions = arrayOfPositions[i].copy() 
+    coords = newXYArray (ePositions)
+    ePositions, lenPosition = fixOverlap(coords, radius, bounds)
+    while (lenPosition > 0):
+      ePositions, lenPosition = fixOverlap(ePositions, radius, bounds)
+    ePositions = backTo1DArray(ePositions)
+    arrayOfPositions[i] = ePositions
