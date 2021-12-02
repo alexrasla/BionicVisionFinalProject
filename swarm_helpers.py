@@ -54,22 +54,23 @@ def particle_swarm(iterations, bounds, model):
         # Part 1: Update personal best
         # Computes current cost of electrodes
         swarm.current_cost = err_func(swarm.position, bounds, model=model)
-        swarm.pbest_cost = err_func(swarm.pbest_pos, bounds, model=model)  # Compute personal best pos
-        # swarm.pbest_pos, swarm.pbest_cost = P.update_pbest(swarm)
-        
-        if np.min(swarm.current_cost) < swarm.best_cost:
-            swarm.best_cost = swarm.current_cost
-            swarm.best_pos = swarm.position
 
+        minIndex = np.argmin(swarm.current_cost)
+        if (swarm.current_cost[minIndex]) < swarm.best_cost:
+          swarm.best_cost = swarm.current_cost[minIndex]
+          swarm.best_pos = swarm.position[minIndex]
 
         # Part 3: Update position and velocity matrices
         # Note that position and velocity updates are dependent on your topology
         # Takes in the bounds 
         swarm.velocity = my_topology.compute_velocity(swarm)
         swarm.position = my_topology.compute_position(swarm, bounds)
+
+        overlapOverWholeSwarm(swarm.position, overlapBounds)
         
-        if i % 10 == 0:
-            print(f"[Iteration {i}] Best Cost: {swarm.best_cost}")
+        # if i % 10 == 0:
+        #     print(f"[Iteration {i}] Best Cost: {swarm.best_cost}")
+        print("best cost:", swarm.best_cost)
 
     return swarm.best_pos, swarm.best_cost 
 
