@@ -9,7 +9,7 @@ def build_implant(params, r=100):
     '''
 
     electrodes = []
-    for i in range(len(params) - 1):
+    for i in range(0, len(params) - 1, 2):
           electrodes.append(p2p.implants.DiskElectrode(params[i], params[i+1], 0, r))
     
     implant = p2p.implants.ProsthesisSystem(p2p.implants.ElectrodeArray(electrodes))
