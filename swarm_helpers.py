@@ -1,4 +1,4 @@
-from operator import mod
+from operator import index, mod
 import numpy as np
 import pyswarms as ps
 import pyswarms.backend as P
@@ -11,6 +11,7 @@ from scipy.spatial.distance import cdist
 from scipy.spatial import distance
 import random
 import json
+import math
 
 import implant_helpers as imp
 
@@ -29,34 +30,70 @@ def loss_func_basic(swarm_positions, electrode_size, bounds, model):
     return np.array(scores)
 
 def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
+    PENALTY_DISTANCE = electrode_size * 2
     
     # Electrode positions
     scores = []
     for electrode_positions in swarm_positions:
         
+        # print('electrode', electrode_positions)
         implant = imp.build_implant(electrode_positions, electrode_size)
         n_eff = imp.get_num_effective(implant, model)
         scores.append(implant.n_electrodes - n_eff)
         
-        # # Pairwise distance between electrodes:
-        # pair_dist = np.array([(e1.x - e2.x) ** 2 + (e1.y - e2.y) ** 2 
-        #                     for (e1, e2) in combinations(implant.electrode_objects, 2)])
-        # # Maybe try to minimize the average pairwise distance:
-        # avg_pair_dist = np.mean(pair_dist)
-        # # Maybe if they're too close to each other, add a penalty:
-        # too_close_penalty = np.sum(pair_dist <= 200 ** 2)
+        coords = newXYArray(electrode_positions)
+        indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=True)
+        num_too_close = len(indexes)
 
-        # # Need to add your own weights, of course, and play with different terms:
-        # scores.append( -(1000 * n_eff - 0.1 * avg_pair_dist - 1e5 * too_close_penalty))
+        score = (implant.n_electrodes - n_eff) + (0.5 * num_too_close)
+        # print('score', score)
+        scores.append(score)
     
     return np.array(scores)
   
-
 def loss_func_too_far(swarm_positions, electrode_size, bounds, model):
-  pass
+  PENALTY_DISTANCE = (electrode_size * 2)
+  
+  # Electrode positions
+  scores = []
+  for electrode_positions in swarm_positions:
+      
+      implant = imp.build_implant(electrode_positions, electrode_size)
+      n_eff = imp.get_num_effective(implant, model)
+      scores.append(implant.n_electrodes - n_eff)
+      
+      coords = newXYArray(electrode_positions)
+      indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=False)
+      num_too_far = len(indexes)
 
-def loss_func_dist_foxea(swarm_positions, electrode_size, bounds, model):
-  pass
+      print('og', (implant.n_electrodes - n_eff))
+      score = (implant.n_electrodes - n_eff) + (0.5 * num_too_far)
+      print('score', score)
+      scores.append(score)
+  
+  return np.array(scores)
+
+def loss_func_dist_fovea(swarm_positions, electrode_size, bounds, model):
+  
+  # Electrode positions
+  scores = []
+  for electrode_positions in swarm_positions:
+      
+      implant = imp.build_implant(electrode_positions, electrode_size)
+      n_eff = imp.get_num_effective(implant, model)
+      scores.append(implant.n_electrodes - n_eff)
+      
+      coords = newXYArray(electrode_positions)
+      zero = [(0,0)]
+      distArray = distance.cdist(zero, coords)
+
+      sum_dist = np.sum(distArray)
+
+      score = (implant.n_electrodes - n_eff) + (1e-4 * sum_dist)
+      # print('score', score)
+      scores.append(score)
+  
+  return np.array(scores)
 
 def loss_func_convex_hull(swarm_positions, electrode_size, bounds, model):
   pass
@@ -105,9 +142,34 @@ def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bo
       
     return swarm.best_pos, swarm.best_cost 
 
+def distance_penalty(ePositions, penalty_dist, less_than):
+  coords = ePositions.copy()
+  distArray = distance.cdist(coords, coords, 'euclidean')
+  arrayLen = distArray.shape[0]
+  numColumns = arrayLen - 1
+  numRows = arrayLen - 1
+
+  penalty_items = []
+  for row in range (0, numRows):
+    for col in range (row+1, numColumns + 1):
+      arrayItem = distArray[row][col]
+      # This line sets what is considered overlap distance
+      if less_than:
+        if arrayItem < penalty_dist:
+          penalty_items.append(row)
+          penalty_items.append(col)
+      else:
+        # if k closest are not within penalty distance
+        if arrayItem > penalty_dist:
+          penalty_items.append(row)
+          penalty_items.append(col)
+  
+  penalty_index = list(set(penalty_items))
+
+  return penalty_index
+
+
 # Method for dealing with overlapping electrodes
-
-
 def findOverlap (ePositions, r):
   coords = ePositions.copy()
   distArray = distance.cdist(coords, coords, 'euclidean')
