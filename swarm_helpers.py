@@ -16,7 +16,19 @@ import implant_helpers as imp
 
 # The error function must accept a tuple of parameter values `params` first, but
 # can have other input variables like `features` and `targets`
-def loss_func_1(swarm_positions, electrode_size, bounds, model):
+
+def loss_func_basic(swarm_positions, electrode_size, bounds, model):
+    
+    scores = []
+    for electrode_positions in swarm_positions:
+        
+        implant = imp.build_implant(electrode_positions, electrode_size)
+        n_eff = imp.get_num_effective(implant, model)
+        scores.append(implant.n_electrodes - n_eff)
+          
+    return np.array(scores)
+
+def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
     
     # Electrode positions
     scores = []
@@ -39,16 +51,15 @@ def loss_func_1(swarm_positions, electrode_size, bounds, model):
     
     return np.array(scores)
   
-def loss_func_2(swarm_positions, electrode_size, bounds, model):
-    
-    scores = []
-    for electrode_positions in swarm_positions:
-        
-        implant = imp.build_implant(electrode_positions, electrode_size)
-        n_eff = imp.get_num_effective(implant, model)
-        scores.append(implant.n_electrodes - n_eff)
-          
-    return np.array(scores)
+
+def loss_func_too_far(swarm_positions, electrode_size, bounds, model):
+  pass
+
+def loss_func_dist_foxea(swarm_positions, electrode_size, bounds, model):
+  pass
+
+def loss_func_convex_hull(swarm_positions, electrode_size, bounds, model):
+  pass
 
 
 def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bounds, overlapBounds, model, experiments, loss_func):
