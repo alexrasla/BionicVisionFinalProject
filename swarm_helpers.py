@@ -13,6 +13,7 @@ from scipy.spatial import distance
 import random
 import json
 import math
+from numpy import linalg
 
 import implant_helpers as imp
 
@@ -54,7 +55,7 @@ def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
         n_eff = imp.get_num_effective(implant, model)
         
         coords = newXYArray(electrode_positions)
-        indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=True)
+        indexes = distance_penalty(coords, PENALTY_DISTANCE)
         num_too_close = len(indexes)
 
         score = (implant.n_electrodes - n_eff) + (0.5 * num_too_close)
@@ -65,16 +66,16 @@ def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
 def loss_func_too_far(swarm_positions, electrode_size, bounds, model):
   PENALTY_DISTANCE = (electrode_size * 2)
   
-  # Electrode positions
   scores = []
+  # Electrode positions
   for electrode_positions in swarm_positions:
       
       implant = imp.build_implant(electrode_positions, electrode_size)
       n_eff = imp.get_num_effective(implant, model)
       
-      coords = newXYArray(electrode_positions)
-      indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=False)
-      num_too_far = len(indexes)
+      ePositions = newXYArray(electrode_positions)
+
+      num_too_far = penalityBoundary (ePositions, PENALTY_DISTANCE, bounds)
 
       # print('og', (implant.n_electrodes - n_eff))
       score = (implant.n_electrodes - n_eff) + (0.5 * num_too_far)
@@ -182,20 +183,45 @@ def distance_penalty(ePositions, penalty_dist, less_than):
   for row in range (0, numRows):
     for col in range (row+1, numColumns + 1):
       arrayItem = distArray[row][col]
-      # This line sets what is considered overlap distance
-      if less_than:
-        if arrayItem < penalty_dist:
-          penalty_items.append(row)
-          penalty_items.append(col)
-      else:
-        # if k closest are not within penalty distance
-        if arrayItem > penalty_dist:
-          penalty_items.append(row)
-          penalty_items.append(col)
+      if arrayItem < penalty_dist:
+        penalty_items.append(row)
+        penalty_items.append(col)
   
   penalty_index = list(set(penalty_items))
 
   return penalty_index
+
+
+def penalityBoundary (ePositions, penalty_dist, bds):
+  x, y = bds
+  coords = newXYArray(ePositions)
+  boundaryPoints = []
+  # Need to calculate the points of all 4 corners and make lines for the boundaries 
+  bottomLeft = (x[0], y[0])
+  topLeft = (x[0], y[1])
+  bottomRight = (x[1], y[0])
+  topRight = (x[1], y[1])
+
+  leftLine = (bottomLeft, topLeft)
+  rightLine = (bottomRight, topRight)
+  bottomLine = (bottomLeft, bottomRight)
+  topLine = (topLeft, topRight)
+
+  lines = [leftLine, rightLine, bottomLine, topLine]
+
+  boundaryPoints = []
+
+  for i in range(len(ePositions)):
+    for line in lines:
+      point1 = line[0]
+      point2 = line[1]
+      point3 = ePositions[i]
+      distToBoundary = np.abs(linalg.norm(np.cross(point2 - point1, point1 - point3))/ linalg.norm(point2 - point1))
+      if distToBoundary < penalty_dist:
+        boundaryPoints.append(i)
+  
+  tooCloseList = list(set(boundaryPoints))
+  return len(tooCloseList)
 
 
 # Method for dealing with overlapping electrodes
