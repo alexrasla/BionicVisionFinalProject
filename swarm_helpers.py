@@ -8,6 +8,7 @@ from pyswarms.backend.topology import Ring
 from itertools import combinations
 
 from scipy.spatial.distance import cdist
+from scipy.spatial import ConvexHull, convex_hull_plot_2d
 from scipy.spatial import distance
 import random
 import json
@@ -27,7 +28,7 @@ def loss_func_basic(swarm_positions, electrode_size, bounds, model):
         n_eff = imp.get_num_effective(implant, model)
         scores.append(implant.n_electrodes - n_eff)
           
-    return np.array(scores)
+    return np.array(scores), n_eff
 
 def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
     PENALTY_DISTANCE = electrode_size * 2
@@ -49,7 +50,7 @@ def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
         # print('score', score)
         scores.append(score)
     
-    return np.array(scores)
+    return np.array(scores), n_eff
   
 def loss_func_too_far(swarm_positions, electrode_size, bounds, model):
   PENALTY_DISTANCE = (electrode_size * 2)
@@ -66,12 +67,12 @@ def loss_func_too_far(swarm_positions, electrode_size, bounds, model):
       indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=False)
       num_too_far = len(indexes)
 
-      print('og', (implant.n_electrodes - n_eff))
+      # print('og', (implant.n_electrodes - n_eff))
       score = (implant.n_electrodes - n_eff) + (0.5 * num_too_far)
-      print('score', score)
+      # print('score', score)
       scores.append(score)
   
-  return np.array(scores)
+  return np.array(scores), n_eff
 
 def loss_func_dist_fovea(swarm_positions, electrode_size, bounds, model):
   
@@ -93,10 +94,26 @@ def loss_func_dist_fovea(swarm_positions, electrode_size, bounds, model):
       # print('score', score)
       scores.append(score)
   
-  return np.array(scores)
+  return np.array(scores), n_eff
 
 def loss_func_convex_hull(swarm_positions, electrode_size, bounds, model):
-  pass
+  # Electrode positions
+  scores = []
+  for electrode_positions in swarm_positions:
+      
+      implant = imp.build_implant(electrode_positions, electrode_size)
+      n_eff = imp.get_num_effective(implant, model)
+      scores.append(implant.n_electrodes - n_eff)
+      
+      coords = newXYArray(electrode_positions)
+      coords = np.array(coords)
+      hull = ConvexHull(coords)
+
+      score = (implant.n_electrodes - n_eff) + (0.5e-6 * hull.volume)
+      # print('score', score)
+      scores.append(score)
+  
+  return np.array(scores), n_eff
 
 
 def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bounds, overlapBounds, model, experiments, loss_func):
@@ -115,13 +132,14 @@ def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bo
 
     for i in range(iterations):
         # Update personal best
-        swarm.current_cost = eval(loss_func + "(swarm.position, int(electrode_size), bounds, model)")
-        # swarm.current_cost = err_func(swarm.position, int(electrode_size), bounds, model=model)
+        swarm.current_cost, n_eff = eval(loss_func + "(swarm.position, int(electrode_size), bounds, model)")
         
+        print(swarm.current_cost.shape)
         minIndex = np.argmin(swarm.current_cost)
         
         if (swarm.current_cost[minIndex]) < swarm.best_cost:
           swarm.best_cost = swarm.current_cost[minIndex]
+          print(swarm.position.shape, minIndex)
           swarm.best_pos = swarm.position[minIndex]
                   
         # Update position and velocity matrices
@@ -135,12 +153,14 @@ def particle_swarm(num_electrodes, electrode_size, num_particles, iterations, bo
         curr_experiment["best_cost_iterations"].append(int(swarm.best_cost))
     
     curr_experiment["best_cost"] = int(swarm.best_cost)
+    curr_experiment["best_positions"] = list(swarm.best_pos)
+    curr_experiment["best_num_eff"] = int(n_eff)
     
     with open('data.json', 'w') as data:
       json.dump(experiments, data)
-      print("JSON Updated")
+      print("Data JSON Updated")
       
-    return swarm.best_pos, swarm.best_cost 
+    return swarm.best_pos, swarm.best_cost, n_eff 
 
 def distance_penalty(ePositions, penalty_dist, less_than):
   coords = ePositions.copy()
