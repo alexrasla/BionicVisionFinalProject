@@ -55,7 +55,7 @@ def loss_func_too_close(swarm_positions, electrode_size, bounds, model):
         n_eff = imp.get_num_effective(implant, model)
         
         coords = newXYArray(electrode_positions)
-        indexes = distance_penalty(coords, PENALTY_DISTANCE)
+        indexes = distance_penalty(coords, PENALTY_DISTANCE, less_than=True)
         num_too_close = len(indexes)
 
         score = (implant.n_electrodes - n_eff) + (0.5 * num_too_close)
@@ -213,10 +213,10 @@ def penalityBoundary (ePositions, penalty_dist, bds):
 
   for i in range(len(ePositions)):
     for line in lines:
-      point1 = line[0]
-      point2 = line[1]
-      point3 = ePositions[i]
-      distToBoundary = np.abs(linalg.norm(np.cross(point2 - point1, point1 - point3))/ linalg.norm(point2 - point1))
+      point1 = np.array(line[0])
+      point2 = np.array(line[1])
+      point3 = np.array(ePositions[i])
+      distToBoundary = np.abs(np.cross(point2 - point1, point1 - point3))
       if distToBoundary < penalty_dist:
         boundaryPoints.append(i)
   
