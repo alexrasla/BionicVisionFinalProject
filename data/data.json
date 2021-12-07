@@ -1,0 +1,228 @@
+{
+    "20": {
+        "100": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        },
+        "150": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        },
+        "200": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        }
+    },
+    "60": {
+        "50": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        },
+        "100": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        },
+        "150": {
+            "loss_func_basic": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_close": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_too_far": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_dist_fovea": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            },
+            "loss_func_convex_hull": {
+                "initial_num_effective": 0,
+                "best_cost": 0,
+                "best_cost_iterations": [],
+                "best_num_eff": 0,
+                "best_positions": []
+            }
+        }
+    }
+}
